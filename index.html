@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Clash 2.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            color: #fff;
+        }
+        #starfield {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            display: block;
+        }
+        #gameTitleBar {
+            width: 100vw;
+            text-align: center;
+            margin-top: 32px;
+            margin-bottom: 0;
+        }
+        #mainContent {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 48px;
+            width: 100vw;
+            max-width: 1400px;
+        }
+        #leftSidebar {
+            min-width: 340px;
+            max-width: 400px;
+            margin-bottom: 0;
+            margin-top: 40px;
+        }
+        #logo {
+            font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 48px;
+            color: #fff;
+            text-shadow: 0 0 10px #00f, 0 0 20px #0ff;
+            letter-spacing: 4px;
+            display: inline-block;
+        }
+        #rightSidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-width: 300px;
+            max-width: 340px;
+        }
+        #highScoreHighlight {
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            font-size: 18px;
+            min-width: 420px;
+            max-width: 520px;
+            margin-top: 40px;
+        }
+        #highScoreHighlightList {
+            font-size: 24px;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 2px;
+            width: 100%;
+            padding-left: 24px;
+            box-sizing: border-box;
+        }
+        #supportSection {
+            margin-top: 0;
+            text-align: center;
+        }
+        #gameContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 40px;
+            background: rgba(10, 10, 20, 0.95);
+            border: 6px solid #00f0ff;
+            border-radius: 24px;
+            box-shadow: 0 0 32px #00f0ff, 0 0 8px #fff inset;
+            padding: 32px 32px 24px 32px;
+        }
+        #gameCanvas {
+            margin-bottom: 16px;
+            display: block;
+        }
+        #startPanel {
+            width: 100%;
+            margin: 32px 0 0 0;
+            padding: 32px 0 28px 0;
+            background: linear-gradient(135deg, #1b2b64 0%, #5a189a 100%);
+            border: 3px solid #00fff7;
+            border-radius: 22px;
+            box-shadow: 0 0 32px #00fff7, 0 0 12px #5a189a inset;
+            backdrop-filter: blur(6px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        #startButton {
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 0;
+            padding: 16px 48px;
+            font-size: 28px;
+            font-family: 'Orbitron', Arial, sans-serif;
+            background: linear-gradient(90deg, #ff0080 0%, #7928ca 100%);
+            color: #fff;
+            border: 4px solid #fff200;
+            border-radius: 16px;
+            box-shadow: 0 0 16px #fff200, 0 0 8px #ff0080 inset;
+            text-shadow: 0 0 8px #fff, 0 0 2px #000;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        #startButton:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 32px #fff200, 0 0 16px #ff0080 inset;
+        }
+        #tipContainer {
+            position: fixed;
+            left: 50%;
+            bottom: 60px;
+            transform: translateX(-50%);
+            background: rgba(30, 30, 60, 0.85);
+            border: 2px solid #00fff7;
+            box-shadow: 0 0 16px #00fff7, 0 0 4px #fff inset;
+            color: #fff;
+            font-family: 'Orbitron', 'Courier New', monospace;
+            font-size: 22px;
+            padding: 18px 36px;
+            border-radius: 16px;
+            text-shadow: 0 0 8px #00fff7, 0 0 2px #000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+            transition: opacity 0.4s;
+            backdrop-filter: blur(4px);
+        }
+        #tipContainer.show {
+            opacity: 1;
+        }
+        #rotatingTipBox {
+            margin-top: 18px;
+            background: rgba(30, 30, 60, 0.85);
+            border: 2px solid #00fff7;
+            box-shadow: 0 0 12px #00fff7, 0 0 2px #fff inset;
+            color: #fff;
+            font-family: 'Orbitron', 'Courier New', monospace;
+            font-size: 18px;
+            padding: 14px 24px;
+            border-radius: 14px;
+            text-shadow: 0 0 6px #00fff7, 0 0 1px #000;
+            min-height: 32px;
+            min-width: 220px;
+            text-align: center;
+            transition: opacity 0.4s;
+            opacity: 0.95;
+        }
+        #settingsContainer { position: absolute; top: 0; right: 0; width: auto; z-index: 2100; }
+        #settingsButton:hover, #settingsButton:focus { background: rgba(40,0,60,0.95); box-shadow: 0 0 24px #ff00ff, 0 0 8px #fff inset; }
+        #settingsDropdown { animation: neonDrop 0.35s cubic-bezier(0.23, 1, 0.32, 1); }
+        @keyframes neonDrop {
+            0% { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        #highScoreBoard, #highScoreHighlight {
+            min-width: 420px;
+            max-width: 520px;
+            border: 3px solid #00fff7;
+            border-radius: 18px;
+            box-shadow: 0 0 32px #00fff7, 0 0 8px #fff inset;
+            background: rgba(10, 10, 30, 0.92);
+        }
+        #highScoreList, #highScoreHighlightList {
+            font-size: 18px;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 2px;
+            width: 100%;
+            padding-left: 24px;
+            box-sizing: border-box;
+        }
+        #highScoreBoard h2, #highScoreHighlight h2 {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            font-size: 28px;
+            color: #00fff7;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px #00fff7, 0 0 2px #000;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+        /* Share Overlay Styles */
+        #shareOverlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10,10,30,0.92);
+            color: #fff;
+            z-index: 30;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', Arial, sans-serif;
+            border-radius: 24px;
+            box-shadow: 0 0 32px #00fff7, 0 0 8px #ff00ff inset;
+            animation: neonDrop 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        #shareOverlay h2 {
+            color: #00fff7;
+            font-size: 32px;
+            margin-bottom: 18px;
+            text-shadow: 0 0 8px #00fff7, 0 0 2px #000;
+        }
+        .shareButton {
+            font-size: 22px;
+            font-family: 'Orbitron', Arial, sans-serif;
+            background: linear-gradient(90deg, #ff0080 0%, #00fff7 100%);
+            color: #fff;
+            border: 2px solid #fff200;
+            border-radius: 14px;
+            box-shadow: 0 0 16px #fff200, 0 0 8px #ff0080 inset;
+            padding: 12px 32px;
+            margin: 12px 0;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .shareButton:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 32px #fff200, 0 0 16px #ff0080 inset;
+        }
+        #copyStatus {
+            color: #ffd700;
+            font-size: 18px;
+            margin-top: 8px;
+            min-height: 24px;
+        }
+        /* High Score Entry Social Sharing */
+        #highScoreEntry .shareButtonsRow {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 12px;
+        }
+        #highScoreEntry .shareButton {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-family: 'Orbitron', Arial, sans-serif;
+            background: linear-gradient(90deg, #232b64 0%, #5a189a 100%);
+            color: #fff;
+            border: 2px solid #00fff7;
+            border-radius: 32px;
+            box-shadow: 0 0 8px #00fff7, 0 0 4px #5a189a inset;
+            padding: 8px 18px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            min-width: 0;
+            min-height: 0;
+            outline: none;
+        }
+        #highScoreEntry .shareButton:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 16px #00fff7, 0 0 8px #5a189a inset;
+        }
+        #highScoreEntry .shareButton svg, #highScoreEntry .shareButton .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+        #highScoreEntry #copyStatus {
+            color: #ffd700;
+            font-size: 16px;
+            margin-top: 6px;
+            min-height: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+  <div id="gameTitleBar">
+    <div id="logo">
+      <span style="vertical-align: middle;">🚀</span>
+      <span style="letter-spacing: 4px;">Space Clash 2.0</span>
+      <span style="vertical-align: middle;">🪐</span>
+    </div>
+  </div>
+  <div id="mainContent">
+    <div id="leftSidebar">
+      <div id="scoreBox" style="background:rgba(0,0,0,0.85);border:2px solid #00fff7;box-shadow:0 0 12px #00fff7,0 0 2px #fff inset;color:#fff;font-family:'Orbitron','Courier New',monospace;font-size:28px;padding:18px 0 10px 0;border-radius:14px;text-align:center;margin-bottom:22px;letter-spacing:2px;text-shadow:0 0 8px #00fff7,0 0 2px #000;">
+        <span>Score: <span id="scoreBoxValue">0</span></span><br>
+        <span>Level: <span id="scoreBoxLevel">1</span></span>
+      </div>
+      <div id="howToPlay">
+        <h2 style="margin-top:0;">How to Play</h2>
+        <ul>
+          <li>Move your ship: <b>Arrow keys</b> or <b>A/D</b></li>
+          <li>Shoot: <b>Spacebar</b> or <b>Mouse Click</b></li>
+          <li>Destroy all invaders to advance to the next level</li>
+          <li>Hit the bonus ship for extra points!</li>
+          <li>The game ends if an invader reaches your ship</li>
+          <li>Try to get the highest score possible!</li>
+        </ul>
+      </div>
+      <div id="pointsSection" style="margin-top: 0; background: rgba(0,0,0,0.7); color: #fff; display: inline-block; padding: 16px 32px; border-radius: 12px; font-size: 18px;">
+        <h2 style="margin-top:0;">Points</h2>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li style="display: flex; align-items: center; margin-bottom: 12px;">
+            <img src="assets/invader_small1-45x47.png" alt="Small Invader" style="width:32px; height:32px; margin-right: 12px; background: #222; border-radius: 6px;"> Small Invader: <b style="margin-left: 8px; color: #ffd700;">150</b>
+          </li>
+          <li style="display: flex; align-items: center; margin-bottom: 12px;">
+            <img src="assets/invader_medium1-49x52.png" alt="Medium Invader" style="width:32px; height:32px; margin-right: 12px; background: #222; border-radius: 6px;"> Medium Invader: <b style="margin-left: 8px; color: #ffd700;">100</b>
+          </li>
+          <li style="display: flex; align-items: center; margin-bottom: 12px;">
+            <img src="assets/invader_large1-52x56.png" alt="Large Invader" style="width:32px; height:32px; margin-right: 12px; background: #222; border-radius: 6px;"> Large Invader: <b style="margin-left: 8px; color: #ffd700;">50</b>
+          </li>
+          <li style="display: flex; align-items: center; margin-bottom: 12px;">
+            <img src="assets/bonus_saucer1-42x23.png" alt="Bonus Ship" style="width:32px; height:23px; margin-right: 12px; background: #222; border-radius: 6px;"> Bonus Ship: <b style="margin-left: 8px; color: #ffd700;">2500</b>
+          </li>
+        </ul>
+      </div>
+      <div id="rotatingTipBox"></div>
+    </div>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="startPanel"><button id="startButton">Start Game</button></div>
+        <div id="gameOverModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10;">
+          <h2 id="gameOverText"></h2>
+          <button id="playAgainButton" style="padding: 10px 30px; font-size: 20px; background: #ff0000; color: white; border: none; border-radius: 50px; margin-top: 20px; cursor: pointer;">Play Again</button>
+        </div>
+        <div id="highScoreEntry" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:20;">
+          <h2>New High Score!</h2>
+          <p>Your Score: <span id="entryScore"></span></p>
+          <input id="playerNameInput" type="text" maxlength="10" pattern="[A-Za-z0-9]{1,10}" placeholder="Enter Name (max 10 chars)" style="font-size: 24px; text-align: center; width: 300px; margin-bottom: 16px;" />
+          <button id="submitScoreButton" style="padding: 10px 30px; font-size: 20px; background: #00c853; color: white; border: none; border-radius: 50px; cursor: pointer;">Submit</button>
+          <div class="shareButtonsRow">
+            <button class="shareButton" id="twitterShareButtonEntry">Twitter/X</button>
+            <button class="shareButton" id="facebookShareButtonEntry">Facebook</button>
+            <button class="shareButton" id="redditShareButtonEntry">Reddit</button>
+            <button class="shareButton" id="whatsappShareButtonEntry">WhatsApp</button>
+            <button class="shareButton" id="copyLinkButtonEntry">Copy</button>
+          </div>
+          <div id="copyStatus"></div>
+        </div>
+        <div id="highScoreBoard" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:20;">
+          <h2>High Scores</h2>
+          <ol id="highScoreList" style="font-size: 24px; text-align: left;"></ol>
+          <button id="closeHighScoreButton" style="padding: 10px 30px; font-size: 20px; background: #2196f3; color: white; border: none; border-radius: 50px; cursor: pointer; margin-top: 20px;">Close</button>
+        </div>
+        <div id="shareOverlay">
+          <h2>Share Your Score!</h2>
+          <button class="shareButton" id="twitterShareButton">Share on Twitter/X</button>
+          <button class="shareButton" id="copyLinkButton">Copy Score & Link</button>
+          <div id="copyStatus"></div>
+          <button class="shareButton" id="closeShareButton" style="background:rgba(0,0,0,0.5);border:2px solid #00fff7;">Close</button>
+        </div>
+    </div>
+    <div id="rightSidebar">
+      <div id="highScoreHighlight">
+        <h2>High Scores</h2>
+        <ol id="highScoreHighlightList"></ol>
+      </div>
+      <div id="supportSection" style="margin-top: 0;">
+        <h2>Support This Project</h2>
+        <p>If you enjoyed Space Clash 2.0, consider supporting development!</p>
+        <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 12px;">
+          <a href="https://www.buymeacoffee.com/yourUsername" target="_blank" style="display: inline-block; border-radius: 12px; box-shadow: 0 0 16px 2px #ffd70055; background: #222; padding: 8px 16px; transition: box-shadow 0.3s;">
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 48px; border-radius: 8px; box-shadow: 0 0 8px #ffd700; margin-bottom: 4px;">
+          </a>
+          <span style="color: #ffd700; font-size: 16px; font-family: 'Orbitron', 'Courier New', monospace;">Fuel the mission 🚀</span>
+        </div>
+        <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Your support keeps the stars shining!</p>
+      </div>
+    </div>
+    <div id="tipContainer"></div>
+  </div>
+  <div id="settingsContainer">
+    <button id="settingsButton" title="Settings" style="position: absolute; top: 24px; right: 32px; z-index: 2100; background: rgba(30,30,60,0.85); border: 2px solid #00fff7; border-radius: 16px; padding: 10px 24px; color: #fff; font-size: 20px; font-family: 'Orbitron', monospace; box-shadow: 0 0 12px #00fff7, 0 0 2px #fff inset; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s, box-shadow 0.2s; outline: none;">
+      <span>Settings</span> <span style="font-size: 22px;">⚙️</span>
+    </button>
+    <div id="settingsDropdown" style="display:none; position: absolute; top: 56px; right: 0; min-width: 240px; background: rgba(30,30,60,0.95); border: 2px solid #00fff7; border-radius: 18px; box-shadow: 0 0 24px #00fff7, 0 0 8px #fff inset; padding: 18px 24px; color: #fff; font-family: 'Orbitron', monospace; font-size: 18px; z-index: 2200;">
+      <div>
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <input type="checkbox" id="soundEffectsToggle" style="accent-color: #ffd700; width: 20px; height: 20px;"> Sound Effects
+        </label>
+      </div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+  <script>
+  (function() {
+    // --- Settings Dropdown Logic ---
+    const settingsBtn = document.getElementById('settingsButton');
+    const settingsDropdown = document.getElementById('settingsDropdown');
+    const soundToggle = document.getElementById('soundEffectsToggle');
+    // Load saved preferences
+    soundToggle.checked = localStorage.getItem('soundEffects') !== 'false'; // default ON
+    settingsBtn.onclick = function(e) {
+      e.stopPropagation();
+      settingsDropdown.style.display = settingsDropdown.style.display === 'block' ? 'none' : 'block';
+    };
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!settingsDropdown.contains(e.target) && e.target !== settingsBtn) {
+        settingsDropdown.style.display = 'none';
+      }
+    });
+    // Sound effects toggle
+    soundToggle.onchange = function() {
+      localStorage.setItem('soundEffects', soundToggle.checked);
+      if (window.soundManager) {
+        window.soundManager.setEnabled(soundToggle.checked);
+      }
+    };
+    // --- Starfield Background Logic ---
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    const numStars = 120;
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    function createStars() {
+        stars = [];
+        for (let i = 0; i < numStars; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.2 + 0.3,
+                speed: Math.random() * 0.7 + 0.2,
+                hue: Math.random() * 360
+            });
+        }
+    }
+    createStars();
+    function drawSubtleStarfield() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let star of stars) {
+            const gradient = ctx.createRadialGradient(
+                star.x, star.y, 0,
+                star.x, star.y, star.r * 3
+            );
+            gradient.addColorStop(0, `hsla(${star.hue}, 100%, 100%, 0.8)`);
+            gradient.addColorStop(0.5, `hsla(${star.hue}, 100%, 80%, 0.3)`);
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.r * 3, 0, Math.PI * 2);
+            ctx.fill();
+            star.y += star.speed;
+            if (star.y > canvas.height) {
+                star.x = Math.random() * canvas.width;
+                star.y = 0;
+                star.hue = Math.random() * 360;
+            }
+        }
+    }
+    function animate() {
+        drawSubtleStarfield();
+        requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+  </script>
+</body>
+</html> 
