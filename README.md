@@ -12,7 +12,7 @@ A browser-based arcade shooter. Playable on GitHub Pages.
 
 ## Play Online
 
-[Play Space Clash 2.0 on GitHub Pages](https://yourusername.github.io/your-repo-name/)
+[Play Space Clash 2.0 on GitHub Pages](https://missymedina.github.io/space_clash2.0/)
 
 ## Support the Developer
 
